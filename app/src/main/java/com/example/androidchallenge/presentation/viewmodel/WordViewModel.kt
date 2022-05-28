@@ -24,12 +24,14 @@ import java.util.concurrent.Executors
 class WordViewModel(application: Application) : AndroidViewModel(application) {
 
 
-
+  // the viewModel  in this  project works as a class injector due to restrictions of using
+    // third party library like Hilt for DI .
 
     val pageRepo = PageRepoImp(
-        HTMLParserImp(), Executors.newFixedThreadPool(4), RemoteConnection,
-        WordORM(), application.applicationContext
-    )
+        HTMLParserImp(), Executors.newFixedThreadPool(4),
+        RemoteConnection,
+        WordORM(),
+        application.applicationContext)
     val wordsState = MutableLiveData<WordsState>()
     private val currentWordsList = ArrayList<Word>()
     val testViewModelCreation = "TeSTWDLQWDLQ;MX;QSXMQSX"
@@ -59,8 +61,7 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
     }
 
  fun getWordsList() {
-       pageRepo.getMapOfWords(HandlerCompat.createAsync(Looper.getMainLooper())).value.
-         let { result ->
+       pageRepo.getMapOfWords(HandlerCompat.createAsync(Looper.getMainLooper())){ result ->
             when (result) {
                 is Resource.Successes -> {
                     wordsState.postValue(result.data?.let {
@@ -71,8 +72,8 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
 
                 }
                 is Resource.Loading -> {
-                    wordsState.postValue(WordsState(isLoading = true))
-                    Log.d("TESTTest", "isLoading")
+                    wordsState.postValue(WordsState(isLoading = result.isLoading))
+                    Log.d("TESTTest", result.isLoading.toString())
 
                 }
 

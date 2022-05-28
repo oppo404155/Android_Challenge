@@ -20,15 +20,12 @@ class PageRepoImp constructor(
     private val wordORM: WordORM,
     private val context: Context
 ) : PageRepo {
-    override fun getMapOfWords(resultHandler: Handler)
-            : LiveData<Resource<List<Word>>> {
+    override fun getMapOfWords(resultHandler: Handler, callBck: (Resource<List<Word>>) -> Unit) {
 
-//        val url = URL("http://www.intsabug.com")
-//        val conn: HttpURLConnection = url.openConnection() as HttpURLConnection
 
-        val liveData = MutableLiveData<Resource<List<Word>>>()
+
         executor.execute {
-            resultHandler.post { liveData.postValue(Resource.Loading(isLoading = true)) }
+            resultHandler.post { callBck(Resource.Loading(isLoading = true)) }
             val localWordsList = wordORM.getWordsListFromLocal(context = context)
 
             val isLocalDBIsEmpty = localWordsList.isEmpty()
@@ -37,9 +34,8 @@ class PageRepoImp constructor(
                 Log.d("ForTest", "Im in the cash now$localWordsList")
 
                 resultHandler.post {
-
-                    liveData.postValue(Resource.Loading(isLoading = false))
-                    liveData.postValue(Resource.Successes(localWordsList))
+                    callBck(Resource.Loading(isLoading = false))
+                    callBck(Resource.Successes(localWordsList))
                 }
             } else {
                 val remoteString = try {
@@ -47,13 +43,13 @@ class PageRepoImp constructor(
                         connect()
                     }
                     val flatString: String = parser.parse(connection.inputStream)
-                    Log.d("ForTest",flatString)
+                    Log.d("ForTest", flatString)
                     getWordsFrequency(flatString)
 
                 } catch (e: Exception) {
                     resultHandler.post {
-                        Log.d("ForTest",e.localizedMessage)
-                        liveData.postValue(Resource.Error(error = e.localizedMessage))
+                        Log.d("ForTest", e.localizedMessage)
+                        callBck(Resource.Error(error = e.localizedMessage))
                     }
                     null
 
@@ -61,10 +57,10 @@ class PageRepoImp constructor(
                 remoteString?.let { wordList ->
                     wordORM.clearDataBase(context)
                     wordORM.insertWordsListToLocal(context, wordList)
-                    Log.d("HopeToWork",wordList.toString())
+                    Log.d("HopeToWork", wordList.toString())
                     resultHandler.post {
-                        liveData.postValue(Resource.Successes(wordORM.getWordsListFromLocal(context)))
-                        liveData.postValue(Resource.Loading(false))
+                        callBck(Resource.Successes(wordORM.getWordsListFromLocal(context)))
+                        callBck(Resource.Loading(false))
                     }
                 }
             }
@@ -72,7 +68,7 @@ class PageRepoImp constructor(
         }
 
 
-  return liveData }
+    }
 
     /**
     complexity is equal to O(n) because
