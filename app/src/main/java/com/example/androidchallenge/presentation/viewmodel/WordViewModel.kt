@@ -1,16 +1,20 @@
 package com.example.androidchallenge.presentation.viewmodel
 
 import android.app.Application
+import android.content.Context
 import android.os.Looper
+import android.util.Log
 import androidx.core.os.HandlerCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.example.androidchallenge.data.local.WordORM
 import com.example.androidchallenge.data.parser.HTMLParserImp
 import com.example.androidchallenge.data.remote.RemoteConnection
 import com.example.androidchallenge.data.repositories.PageRepoImp
 import com.example.androidchallenge.domain.models.Word
 import com.example.androidchallenge.domain.repositories.PageRepo
+import com.example.androidchallenge.presentation.ui.MainActivity
 import com.example.androidchallenge.presentation.ui.Sort
 import com.example.androidchallenge.presentation.ui.UiEvent
 import com.example.androidchallenge.presentation.ui.WordsState
@@ -20,24 +24,18 @@ import java.util.concurrent.Executors
 class WordViewModel(application: Application) : AndroidViewModel(application) {
 
 
-// this line can leak the viewModel but it is mandatory for me due to restrictions that you but
-  // in this challenge document (don't use any third party Library) so i could not use dependency injection
-    // to inject the context or any other classes so i used AndroidViewModel over ViewModel
-    // to provide  context object for SQLite
 
-    private val context = getApplication<Application>().applicationContext
-    val pageRepo: PageRepo = PageRepoImp(
+
+    val pageRepo = PageRepoImp(
         HTMLParserImp(), Executors.newFixedThreadPool(4), RemoteConnection,
-        WordORM(), context.applicationContext
+        WordORM(), application.applicationContext
     )
     val wordsState = MutableLiveData<WordsState>()
-    private val currentWordsList= ArrayList<Word>()
+    private val currentWordsList = ArrayList<Word>()
+    val testViewModelCreation = "TeSTWDLQWDLQ;MX;QSXMQSX"
 
-    init {
-        getWordsList()
-    }
 
-    fun onEvent(uievent: UiEvent, callBack: (WordsState) -> Unit) {
+    fun onEvent(uievent: UiEvent) {
         when (uievent) {
             is UiEvent.SearchWord -> {
 
@@ -45,37 +43,49 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
             is UiEvent.SortWords -> {
                 when (uievent.sort) {
                     is Sort.SortAsce -> {
-                       currentWordsList.sortBy {
-                           it.word
-                       }
+                        currentWordsList.sortBy {
+                            it.word
+                        }
                     }
-                    is Sort.SortDesc -> {}
+                    is Sort.SortDesc -> {
+                        currentWordsList.sortByDescending {
+                            it.word
+                        }
+                    }
                 }
             }
         }
 
     }
 
-    private fun getWordsList() {
-        pageRepo.getMapOfWords(HandlerCompat.createAsync(Looper.getMainLooper())).value.let { result ->
+ fun getWordsList() {
+       pageRepo.getMapOfWords(HandlerCompat.createAsync(Looper.getMainLooper())).value.
+         let { result ->
             when (result) {
                 is Resource.Successes -> {
                     wordsState.postValue(result.data?.let {
                         currentWordsList.addAll(it)
+                        Log.d("TESTTest", it.toString())
                         WordsState(words = it)
                     })
 
                 }
                 is Resource.Loading -> {
                     wordsState.postValue(WordsState(isLoading = true))
+                    Log.d("TESTTest", "isLoading")
 
                 }
 
                 is Resource.Error -> {
                     wordsState.postValue(WordsState(errorMessage = "Some errors happened"))
+                    Log.d("TESTTest", "Error")
+
                 }
 
 
+                else -> {
+                    Log.d("TEST", "UnKnown")
+                }
             }
 
         }

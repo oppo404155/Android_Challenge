@@ -2,6 +2,7 @@ package com.example.androidchallenge.data.repositories
 
 import android.content.Context
 import android.os.Handler
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.androidchallenge.data.local.WordORM
@@ -29,10 +30,14 @@ class PageRepoImp constructor(
         executor.execute {
             resultHandler.post { liveData.postValue(Resource.Loading(isLoading = true)) }
             val localWordsList = wordORM.getWordsListFromLocal(context = context)
+
             val isLocalDBIsEmpty = localWordsList.isEmpty()
             val shouldLoadFromCash = !isLocalDBIsEmpty
             if (shouldLoadFromCash) {
+                Log.d("ForTest", "Im in the cash now$localWordsList")
+
                 resultHandler.post {
+
                     liveData.postValue(Resource.Loading(isLoading = false))
                     liveData.postValue(Resource.Successes(localWordsList))
                 }
@@ -42,9 +47,12 @@ class PageRepoImp constructor(
                         connect()
                     }
                     val flatString: String = parser.parse(connection.inputStream)
+                    Log.d("ForTest",flatString)
                     getWordsFrequency(flatString)
+
                 } catch (e: Exception) {
                     resultHandler.post {
+                        Log.d("ForTest",e.localizedMessage)
                         liveData.postValue(Resource.Error(error = e.localizedMessage))
                     }
                     null
@@ -53,6 +61,7 @@ class PageRepoImp constructor(
                 remoteString?.let { wordList ->
                     wordORM.clearDataBase(context)
                     wordORM.insertWordsListToLocal(context, wordList)
+                    Log.d("HopeToWork",wordList.toString())
                     resultHandler.post {
                         liveData.postValue(Resource.Successes(wordORM.getWordsListFromLocal(context)))
                         liveData.postValue(Resource.Loading(false))

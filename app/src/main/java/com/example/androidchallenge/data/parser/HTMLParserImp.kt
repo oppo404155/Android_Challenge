@@ -5,7 +5,9 @@ import java.io.InputStream
 class HTMLParserImp : HTMLParser {
 
     override fun parse(inputStream: InputStream): String {
-        return inputStream.bufferedReader().readText().replace("\\<.*?>", "")
+        return inputStream.bufferedReader().readText().apply {
+            replace("/<[^>]+>/g", "")
+        }
     }
 }
 
