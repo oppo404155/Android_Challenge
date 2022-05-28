@@ -24,35 +24,47 @@ import java.util.concurrent.Executors
 class WordViewModel(application: Application) : AndroidViewModel(application) {
 
 
-  // the viewModel  in this  project works as a class injector due to restrictions of using
+    // the viewModel  in this  project works as a class injector due to restrictions of using
     // third party library like Hilt for DI .
+
 
     val pageRepo = PageRepoImp(
         HTMLParserImp(), Executors.newFixedThreadPool(4),
         RemoteConnection,
         WordORM(),
-        application.applicationContext)
+        application.applicationContext
+    )
     val wordsState = MutableLiveData<WordsState>()
     private val currentWordsList = ArrayList<Word>()
-    val testViewModelCreation = "TeSTWDLQWDLQ;MX;QSXMQSX"
-
-
+    private val filterList = currentWordsList
     fun onEvent(uievent: UiEvent) {
         when (uievent) {
             is UiEvent.SearchWord -> {
+
+                
+                filterList.filter {
+                    it.word.lowercase().contains(uievent.query.lowercase())
+                }
+
+                wordsState.postValue(WordsState(filterList))
 
             }
             is UiEvent.SortWords -> {
                 when (uievent.sort) {
                     is Sort.SortAsce -> {
-                        currentWordsList.sortBy {
+                        val sortedList = currentWordsList
+                        sortedList.sortBy {
                             it.word
                         }
+                        wordsState.postValue(WordsState(sortedList))
+
                     }
                     is Sort.SortDesc -> {
                         currentWordsList.sortByDescending {
                             it.word
                         }
+                        wordsState.postValue(WordsState(currentWordsList))
+
                     }
                 }
             }
@@ -60,14 +72,14 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
 
     }
 
- fun getWordsList() {
-       pageRepo.getMapOfWords(HandlerCompat.createAsync(Looper.getMainLooper())){ result ->
+    fun getWordsList() {
+        pageRepo.getMapOfWords(HandlerCompat.createAsync(Looper.getMainLooper())) { result ->
             when (result) {
                 is Resource.Successes -> {
                     wordsState.postValue(result.data?.let {
                         currentWordsList.addAll(it)
                         Log.d("TESTTest", it.toString())
-                        WordsState(words = it)
+                        WordsState(words = it.sortedBy { it.word })
                     })
 
                 }

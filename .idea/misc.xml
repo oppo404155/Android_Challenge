@@ -3,7 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/pp/AndroidStudioProjects/AndroidChallenge/app/src/main/res/drawable/sort_icon_24.xml" value="0.1755" />
         <entry key="..\:/Users/pp/AndroidStudioProjects/AndroidChallenge/app/src/main/res/layout/activity_main.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/pp/AndroidStudioProjects/AndroidChallenge/app/src/main/res/layout/recycler_item.xml" value="0.25" />
+        <entry key="..\:/Users/pp/AndroidStudioProjects/AndroidChallenge/app/src/main/res/menu/menu.xml" value="0.25" />
       </map>
     </option>
   </component>

@@ -6,24 +6,10 @@ class HTMLParserImp : HTMLParser {
 
     override fun parse(inputStream: InputStream): String {
         return inputStream.bufferedReader().readText().apply {
-            replace("/<[^>]+>/g", "")
+            replace("<([A-Za-z][A-Za-z0-9]*)\\b[^>]*>(.*?)</\\1>", "").split(" ")
         }
     }
 }
 
 
-//           val reader = BufferedReader(InputStreamReader(inputStream))
-//           with(inputStream) {
-//               while ((reader.readLine().also { line = it }) != null) {
-//                   stringBuilder.append(line);
-//               }
-//
-//               close()
-//           }
-//
-//
-//
-//
-//        //regular expression to filter all tags to extract only texts
-//        return stringBuilder.toString().replace("\\<.*?>", "")
 
