@@ -42,11 +42,11 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
             is UiEvent.SearchWord -> {
 
                 
-                filterList.filter {
-                    it.word.lowercase().contains(uievent.query.lowercase())
-                }
-
-                wordsState.postValue(WordsState(filterList))
+//                currentWordsList.filter {
+//                    it.word.lowercase().contains(uievent.query.lowercase())
+//                }
+//
+//                wordsState.postValue(WordsState(currentWordsList))
 
             }
             is UiEvent.SortWords -> {
@@ -90,15 +90,13 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 is Resource.Error -> {
-                    wordsState.postValue(WordsState(errorMessage = "Some errors happened"))
-                    Log.d("TESTTest", "Error")
+                    wordsState.postValue(WordsState(errorMessage = result.error.toString()))
+                    Log.d("TESTTest", result.error.toString())
 
                 }
 
 
-                else -> {
-                    Log.d("TEST", "UnKnown")
-                }
+
             }
 
         }

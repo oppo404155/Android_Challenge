@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.inputmethod.EditorInfo
 import android.widget.ProgressBar
 import android.widget.SearchView
 import android.widget.Toast
@@ -62,16 +63,18 @@ class MainActivity : AppCompatActivity() {
         val searchView: SearchView? = searchItem?.actionView as SearchView
         searchView?.setSearchableInfo(searchManager.getSearchableInfo(componentName))
         searchView?.queryHint = getString(R.string.search)
+        searchView?.imeOptions = EditorInfo.IME_ACTION_DONE;
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
 
-                return true
+                return false
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                viewmodel.onEvent(UiEvent.SearchWord(query = newText!!.lowercase()))
-                searchView.clearFocus()
-                return true
+//                viewmodel.onEvent(UiEvent.SearchWord(query = newText!!.lowercase()))
+//                searchView.clearFocus()
+                wordadapter.filter.filter(newText)
+                return false
             }
         })
 

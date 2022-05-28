@@ -1,15 +1,16 @@
 package com.example.androidchallenge.presentation.adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidchallenge.databinding.RecyclerItemBinding
 import com.example.androidchallenge.domain.models.Word
-import com.example.androidchallenge.presentation.viewmodel.WordViewModel
 
-class WordsAdapter : RecyclerView.Adapter<WordsAdapter.WordViewHolder>() {
+class WordsAdapter : RecyclerView.Adapter<WordsAdapter.WordViewHolder>(), Filterable {
     private val wordslist = ArrayList<Word>()
+    private lateinit var wordslistFull: List<Word>
 
     inner class WordViewHolder(private val binding: RecyclerItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -29,18 +30,48 @@ class WordsAdapter : RecyclerView.Adapter<WordsAdapter.WordViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: WordViewHolder, position: Int) {
-        val word=wordslist.get(position)
+        val word = wordslist.get(position)
         holder.bind(word)
     }
 
     override fun getItemCount(): Int {
-      return wordslist.size
+        return wordslist.size
     }
 
     fun setListItems(words: List<Word>) {
-       wordslist.clear()
+
         wordslist.addAll(words)
+        //copy of wordList for filtering
+        wordslistFull = ArrayList<Word>(wordslist)
         notifyDataSetChanged()
+    }
+
+    override fun getFilter(): Filter {
+        return wordFilter
+    }
+    private val wordFilter: Filter = object : Filter() {
+        override fun performFiltering(constraint: CharSequence): FilterResults {
+            val filteredList: MutableList<Word> = ArrayList()
+            if (constraint == null || constraint.length == 0) {
+                filteredList.addAll(wordslistFull)
+            } else {
+                val filterPattern = constraint.toString().lowercase().trim()
+                for (item in wordslistFull) {
+                    if (item.word.lowercase().contains(filterPattern)) {
+                        filteredList.add(item)
+                    }
+                }
+            }
+            val results = FilterResults()
+            results.values = filteredList
+            return results
+        }
+
+        override fun publishResults(constraint: CharSequence, results: FilterResults) {
+            wordslist.clear()
+            wordslist.addAll(results.values as List<Word>)
+            notifyDataSetChanged()
+        }
     }
 
 
