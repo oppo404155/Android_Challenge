@@ -1,5 +1,6 @@
 package com.example.androidchallenge.presentation.adapters
 
+import android.location.Criteria
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
@@ -7,6 +8,8 @@ import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidchallenge.databinding.RecyclerItemBinding
 import com.example.androidchallenge.domain.models.Word
+import com.example.androidchallenge.presentation.ui.Sort
+import com.example.androidchallenge.presentation.ui.UiEvent
 
 class WordsAdapter : RecyclerView.Adapter<WordsAdapter.WordViewHolder>(), Filterable {
     private val wordslist = ArrayList<Word>()
@@ -30,7 +33,7 @@ class WordsAdapter : RecyclerView.Adapter<WordsAdapter.WordViewHolder>(), Filter
     }
 
     override fun onBindViewHolder(holder: WordViewHolder, position: Int) {
-        val word = wordslist.get(position)
+        val word = wordslist[position]
         holder.bind(word)
     }
 
@@ -52,7 +55,7 @@ class WordsAdapter : RecyclerView.Adapter<WordsAdapter.WordViewHolder>(), Filter
     private val wordFilter: Filter = object : Filter() {
         override fun performFiltering(constraint: CharSequence): FilterResults {
             val filteredList: MutableList<Word> = ArrayList()
-            if (constraint == null || constraint.length == 0) {
+            if (constraint.isEmpty()) {
                 filteredList.addAll(wordslistFull)
             } else {
                 val filterPattern = constraint.toString().lowercase().trim()
@@ -73,6 +76,22 @@ class WordsAdapter : RecyclerView.Adapter<WordsAdapter.WordViewHolder>(), Filter
             notifyDataSetChanged()
         }
     }
+   fun sort(sortCriteria:Sort){
+       when(sortCriteria){
+           is Sort.SortAsce->{
+               wordslist.sortBy {
+                   it.word
+               }
+           }
+           is Sort.SortDesc->{
+               wordslist.sortByDescending {
+                   it.word
 
+               }
+           }
+       }
+       notifyDataSetChanged()
+
+   }
 
 }

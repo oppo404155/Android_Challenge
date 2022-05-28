@@ -4,16 +4,13 @@ import android.app.ProgressDialog
 import android.app.SearchManager
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.inputmethod.EditorInfo
-import android.widget.ProgressBar
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.androidchallenge.R
 import com.example.androidchallenge.databinding.ActivityMainBinding
@@ -83,9 +80,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.sortAsc) {
-            viewmodel.onEvent(UiEvent.SortWords(Sort.SortAsce))
+           wordadapter.sort(Sort.SortAsce)
         } else {
-            viewmodel.onEvent(UiEvent.SortWords(Sort.SortDesc))
+           wordadapter.sort(Sort.SortDesc)
         }
 
 
