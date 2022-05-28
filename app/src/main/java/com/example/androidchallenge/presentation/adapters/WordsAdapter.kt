@@ -1,6 +1,5 @@
 package com.example.androidchallenge.presentation.adapters
 
-import android.location.Criteria
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Filter
@@ -9,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.androidchallenge.databinding.RecyclerItemBinding
 import com.example.androidchallenge.domain.models.Word
 import com.example.androidchallenge.presentation.ui.Sort
-import com.example.androidchallenge.presentation.ui.UiEvent
 
 class WordsAdapter : RecyclerView.Adapter<WordsAdapter.WordViewHolder>(), Filterable {
     private val wordslist = ArrayList<Word>()
