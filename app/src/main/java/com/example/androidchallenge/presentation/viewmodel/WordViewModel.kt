@@ -18,8 +18,8 @@ import java.util.concurrent.Executors
 class WordViewModel(application: Application) : AndroidViewModel(application) {
 
 
-    // the viewModel  in this  project works as a class injector due to restrictions of using
-    // third party library like Hilt for DI .
+    // the viewModel  in this  project works as a repoClass's injector due to restrictions of using
+    // third party libraries like Hilt for DI .
 
 
     private val pageRepo = PageRepoImp(
